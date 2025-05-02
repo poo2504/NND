@@ -1,0 +1,97 @@
+import pandas as pd
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense,Flatten
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.datasets import mnist
+
+
+(x_train,y_train),(x_test,y_test)=mnist.load_data()
+
+
+x_train=x_train/255.0
+x_test=x_test/255.0
+
+
+model=Sequential([
+    Flatten(input_shape=(28,28)),
+    Dense(128,activation='relu'),
+    Dense(10,activation='softmax')
+])
+
+
+model.compile(optimizer=Adam(learning_rate=0.001),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+
+
+history=model.fit(x_train,y_train,epochs=10)
+
+
+plt.imshow(x_test[3])
+
+
+prediction=model.predict(np.expand_dims(x_test[3],axis=0))
+pred=np.argmax(prediction)
+print(pred)
+
+
+##Regression
+# Load libraries
+import pandas as pd
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.optimizers import Adam
+
+
+df = sns.load_dataset('iris')
+
+
+# Encode categorical column
+df = pd.get_dummies(df, columns=['species'])
+
+
+# Feature and Target
+x = df.drop(columns=['sepal_length'])
+y = df['sepal_length']
+
+
+# Split
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+
+
+# Build model
+model = Sequential([
+    Input(shape=(x_train.shape[1],)),  # Better style: separate Input layer
+    Dense(64, activation='relu'),
+    Dense(32, activation='relu'),
+    Dense(1)  # One output neuron for regression
+])
+
+
+# Compile
+model.compile(optimizer=Adam(learning_rate=0.001), loss='mean_squared_error', metrics=['mae'])
+
+
+# Train
+history = model.fit(x_train, y_train, epochs=25, verbose=1)
+
+
+# Predict
+predictions = model.predict(x_test)
+
+
+# Print predictions
+for pred, actual in zip(predictions.flatten(), y_test):
+    print(f'Predicted: {pred:.2f}, Actual: {actual:.2f}')
+
+
+# R2 Score
+r2 = r2_score(y_test, predictions)
+print(f'R2 Score: {r2:.4f}')

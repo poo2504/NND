@@ -1,0 +1,70 @@
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import tensorflow_probability as tfp
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input
+from tensorflow.keras.optimizers import Adam
+import seaborn as sns
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+import matplotlib.pyplot as plt
+
+
+# Load and prepare the Iris dataset
+df = sns.load_dataset('iris')
+x = df.drop(columns=['species'])
+y = df['species']
+
+
+# Encode the labels
+le = LabelEncoder()
+y = le.fit_transform(y)
+
+
+# Split the data
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+
+
+# Define the model using tf.keras.Model
+class BayesianNN(Model):
+    def __init__(self):
+        super(BayesianNN, self).__init__()
+        # Define the DenseFlipout layers
+        self.dense1 = tfp.layers.DenseFlipout(64, activation='relu')
+        self.dense2 = tfp.layers.DenseFlipout(32, activation='relu')
+        self.dense3 = tfp.layers.DenseFlipout(3, activation='softmax')
+    def call(self, inputs):
+        x = self.dense1(inputs)
+        x = self.dense2(x)
+        return self.dense3(x)
+
+
+# Create and compile the Bayesian Neural Network
+model = BayesianNN()
+model.build(input_shape=(None, x_train.shape[1]))  # Set input shape for the model
+model.compile(optimizer=Adam(learning_rate=0.001), 
+              loss='sparse_categorical_crossentropy', 
+              metrics=['accuracy'])
+
+
+# Train the model
+history = model.fit(x_train, y_train, epochs=25, batch_size=32, validation_split=0.2)
+
+
+# Make predictions
+y_pred_prob = model.predict(x_test)
+y_pred = np.argmax(y_pred_prob, axis=1)
+
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted')
+recall = recall_score(y_test, y_pred, average='weighted')
+
+
+# Print the evaluation metrics
+print(f'Accuracy: {accuracy:.4f}')
+print(f'Precision: {precision:.4f}')
+print(f'Recall: {recall:.4f}')

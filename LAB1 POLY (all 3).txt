@@ -1,0 +1,94 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.array([1,2,3,4,5])
+y = np.array([2,4,6,8,10])
+
+coefficients = np.polyfit(x,y,2)
+poly = np.poly1d(coefficients)
+
+plt.scatter(x,y,color='blue', label='Data Points')
+x_line = np.linspace(min(x), max(x), 100)
+plt.plot(x_line, poly(x_line), color='red', label='Fitted Polynomial')
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.legend()
+plt.show()
+
+#optional
+new_x = 13
+predicted_y = poly(new_x)
+print(f"Predicted y value for x={new_x}: {predicted_y}")
+
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('mnist.csv')
+
+coefficients = np.polyfit(x,y,2)
+polynomial = np.poly1d(coefficients)
+
+x_line = np.linspace(min(x), max(x), 10)
+plt.scatter(x,y,color='blue', label='Data Points')
+plt.plot(x_line, polynomial(x_line), color='red', label='Fitted Polynomial')
+
+x_label = 'Hour'
+y_label = 'PM2.5'
+plt.xlabel(x_label)
+plt.ylabel(y_label)
+plt.legend()
+plt.show()
+
+
+
+
+
+
+np.random.seed(123)
+
+noise_level = 10.0  # Standard deviation of noise (can be changed)
+noisy_y = y + np.random.normal(0, noise_level, len(y))
+
+# Set the degree of polynomial (customizable)
+degree = 3
+
+# Fit polynomials to both original and noisy data
+coefficients_original = np.polyfit(x, y, degree)
+polynomial_original = np.poly1d(coefficients_original)
+
+coefficients_noisy = np.polyfit(x, noisy_y, degree)
+polynomial_noisy = np.poly1d(coefficients_noisy)
+
+# Create a smooth line for plotting
+x_line = np.linspace(min(x), max(x), 100)
+y_line_original = polynomial_original(x_line)
+y_line_noisy = polynomial_noisy(x_line)
+
+# Plot original data, noisy data, and both fitted curves
+plt.figure(figsize=(12, 8))
+
+# Original data and fit
+plt.subplot(2, 1, 1)
+plt.scatter(x, y, color='blue', alpha=0.5, label='Original Data')
+plt.plot(x_line, y_line_original, color='red', linewidth=2, label=f'Original Fit (degree={degree})')
+plt.title('Original Data - PM2.5 vs Hour')
+plt.xlabel('Hour of Day')
+plt.ylabel('PM2.5')
+plt.legend()
+plt.grid(True)
+
+# Noisy data and fit
+plt.subplot(2, 1, 2)
+plt.scatter(x, noisy_y, color='green', alpha=0.5, label=f'Noisy Data (σ={noise_level})')
+plt.plot(x_line, y_line_noisy, color='purple', linewidth=2, label=f'Noisy Fit (degree={degree})')
+plt.title('Noisy Data - PM2.5 vs Hour')
+plt.xlabel('Hour of Day')
+plt.ylabel('PM2.5')
+plt.legend()
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()

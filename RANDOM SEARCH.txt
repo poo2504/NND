@@ -1,0 +1,99 @@
+!pip install keras-tuner -q
+import numpy as np
+import keras_tuner as kt
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense,Input
+from tensorflow.keras.optimizers import SGD
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+import seaborn as sns
+import tensorflow as t
+
+
+df = sns.load_dataset('iris')
+df.head()
+x = df.drop(columns=['sepal_length'])
+y = df['sepal_length']
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+le = LabelEncoder()
+x_train['species'] = le.fit_transform(x_train['species'])
+x_test['species']= le.transform(x_test['species'])
+
+
+def test_model(hp):
+    model=Sequential()
+    model.add(Input(shape=(x_train.shape[1],)))
+    model.add(Dense(hp.Int('unit1',min_value=32,max_value=128),activation=hp.Choice('activation1',['relu','tanh','sigmoid'])))
+    model.add(Dense(hp.Int('unit2',min_value=32,max_value=128),activation=hp.Choice('activation2',['relu','tanh','sigmoid'])))
+    model.add(Dense(1))
+    model.compile(optimizer=SGD(hp.Float('optimize',min_value=0.00001,max_value=0.001),momentum=hp.Float('momentum',min_value=0.0,max_value=0.9)),loss='mean_squared_error',metrics=['mae'])
+    return model
+
+
+tuner = kt.RandomSearch(
+    test_model,
+    objective='val_mae',  
+    max_trials=10,
+    executions_per_trial=1, 
+    directory='test', 
+    project_name='iris_reg3' 
+)
+
+
+tuner.search(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
+best_hp = tuner.get_best_hyperparameters(num_trials=1)[0]
+best_model = tuner.hypermodel.build(best_hp)
+best_model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
+loss, mae = best_model.evaluate(x_test, y_test)
+print(f"Test MAE: {mae}")
+
+
+
+import keras_tuner as kt
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense,Input
+from tensorflow.keras.optimizers import SGD
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+import seaborn as sns
+import tensorflow as tf
+
+
+df = sns.load_dataset('iris')
+df.head()
+x = df.drop(columns=['sepal_length'])
+y = df['sepal_length']
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+le = LabelEncoder()
+x_train['species'] = le.fit_transform(x_train['species'])
+x_test['species']= le.transform(x_test['species'])
+
+
+def test_model(hp):
+    model=Sequential()
+    model.add(Input(shape=(x_train.shape[1],)))
+    model.add(Dense(hp.Int('unit1',min_value=32,max_value=128),activation=hp.Choice('activation1',['relu','tanh','sigmoid'])))
+    model.add(Dense(hp.Int('unit2',min_value=32,max_value=128),activation=hp.Choice('activation2',['relu','tanh','sigmoid'])))
+    model.add(Dense(1))
+    model.compile(optimizer=SGD(hp.Float('optimize',min_value=0.00001,max_value=0.001),momentum=hp.Float('momentum',min_value=0.0,max_value=0.9)),loss='mean_squared_error',metrics=['mae'])
+    return model
+
+
+tuner = kt.RandomSearch(
+    test_model,
+    objective='val_mae',  
+    max_trials=10,
+    executions_per_trial=1, 
+    directory='test', 
+    project_name='iris_reg3' 
+)
+
+
+tuner.search(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
+best_hp = tuner.get_best_hyperparameters(num_trials=1)[0]
+best_model = tuner.hypermodel.build(best_hp)
+best_model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
+loss, mae = best_model.evaluate(x_test, y_test)
+print(f"Test MAE: {mae}")
+
+

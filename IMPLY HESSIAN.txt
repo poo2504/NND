@@ -1,0 +1,28 @@
+import numpy as np
+import sympy as sp
+
+
+x,y=sp.symbols('x y')
+f=2*x**2 + 3*y**2+9*x*y+24*x*y+90
+
+
+double_derivative_x=sp.diff(f,x,2)
+double_derivative_y=sp.diff(f,y,2)
+double_derivative_xy=sp.diff(f,x,y)
+
+
+hessian_matrix=sp.Matrix([[double_derivative_x,double_derivative_xy],[double_derivative_xy,double_derivative_y]])
+hessian_matrix
+
+
+##Optional
+determinant=hessian_matrix.det()
+
+
+if determinant>0:
+    if hessian_matrix[0, 0]>0:
+        print('Local Minima')
+    else:
+        print('Local Maxima')
+else:
+    print('Saddle Point')

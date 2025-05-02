@@ -1,0 +1,44 @@
+import numpy as np
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense,Input
+from tensorflow.keras.optimizers import Adam
+
+
+def classification_model(x,y,learning_rate,epochs):
+    model=Sequential([
+        Input(shape=(x.shape[1],)),
+        Dense(8,activation='relu'),
+        Dense(4,activation='relu'),
+        Dense(1,activation='sigmoid')
+    ])
+    model.compile(optimizer=Adam(learning_rate=learning_rate),loss="binary_crossentropy",metrics=['accuracy'])
+    model.fit(x,y,epochs=epochs)
+    return model
+def and_gate():
+    x=np.array([[0,0],[0,1],[1,0],[1,1]])
+    y=np.array([[0],[0],[0],[1]])
+    return x,y
+def nand_gate():
+    x=np.array([[0,0],[0,1],[1,0],[1,1]])
+    y=np.array([[1],[1],[1],[0]])
+    return x,y
+def predictions(x,y,model):
+    pred_values=model.predict(x)
+    for actual,pred in zip(y,pred_values):
+        print(f'Actual Value: {actual} and Predicted Value: {pred}')
+
+
+print('Training for AND gate: ')
+x,y=and_gate()
+model=classification_model(x,y,0.1,400)
+
+
+predictions(x,y,model)
+
+
+print('Training for NAND gate: ')
+x,y=nand_gate()
+model=classification_model(x,y,0.1,400)
+
+
+predictions(x,y,model)

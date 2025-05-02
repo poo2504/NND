@@ -1,0 +1,50 @@
+import numpy as np
+!pip install keras-tuner --quiet
+import keras_tuner as kt
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense,Input
+from tensorflow.keras.optimizers import SGD
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+import seaborn as sns
+import tensorflow as tf
+
+
+df = sns.load_dataset('iris')
+df.head()
+x = df.drop(columns=['species'])
+y = df['species']
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+le = LabelEncoder()
+y_train = le.fit_transform(y_train)
+y_test= le.transform(y_test)
+
+
+def test_model(hp):
+    model=Sequential()
+    model.add(Input(shape=(x_train.shape[1],)))
+    model.add(Dense(hp.Int('unit1',min_value=32,max_value=128),activation=hp.Choice('activation1',['relu','tanh','sigmoid'])))
+    model.add(Dense(hp.Int('unit2',min_value=32,max_value=128),activation=hp.Choice('activation2',['relu','tanh','sigmoid'])))
+    model.add(Dense(3,activation='softmax'))
+    model.compile(optimizer=SGD(hp.Float('optimize',min_value=0.00001,max_value=0.001),momentum=hp.Float('momentum',min_value=0.0,max_value=0.9)),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+    return model
+
+
+tuner = kt.RandomSearch(
+    test_model,
+    objective='val_accuracy',  
+    max_trials=10,
+    executions_per_trial=1, 
+    directory='test', 
+    project_name='iris' 
+)
+
+
+# Changed X_train and X_test to x_train and x_test respectively
+tuner.search(x_train, y_train, epochs=10, validation_data=(x_test, y_test)) 
+best_hp = tuner.get_best_hyperparameters(num_trials=1)[0]
+best_model = tuner.hypermodel.build(best_hp)
+# Changed X_train and X_test to x_train and x_test respectively
+best_model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test))  
+loss, accuracy = best_model.evaluate(x_test, y_test)
+print(f"Test Accuracy: {accuracy}")

@@ -1,0 +1,48 @@
+import numpy as np
+import pandas as pd
+from sklearn.mixture import GaussianMixture
+import seaborn as sns
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+
+df=sns.load_dataset('iris')
+df.head()
+
+
+x=df.drop(columns=['species'])
+y=df['species']
+
+
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=42)
+
+
+le=LabelEncoder()
+y_train=le.fit_transform(y_train)
+y_test=le.transform(y_test)
+
+
+gmm=GaussianMixture(n_components=3,covariance_type='full')
+
+
+gmm.fit(x_train)
+
+
+responsibilities=gmm.predict_proba(x_train)
+converged=gmm.converged_
+
+
+print("Expectation Step (responsibilities for each data point):\n", responsibilities[:5])  # Show first 5 points
+print("Maximization Step (Updated means of the GMM):\n", gmm.means_)
+print("Maximization Step (Updated covariances of the GMM):\n", gmm.covariances_)
+print("Convergence status: ", converged)
+
+
+plt.scatter(x_train.iloc[:, 0], x_train.iloc[:, 1], c=gmm.predict(x_train), cmap='viridis')
+plt.title("Gaussian Mixture Model Clustering (EM Algorithm)")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.show()
+
+
