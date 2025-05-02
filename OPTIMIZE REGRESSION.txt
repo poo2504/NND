@@ -47,4 +47,32 @@ best_model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
 loss, mae = best_model.evaluate(x_test, y_test)
 print(f"Test MAE: {mae}")
 
+TO SEE AND UPDATE WEIGHTS
+# Access weights and biases of the model
+weights_and_biases = best_model.get_weights()
+
+# Print the weights and biases of the first layer (Dense layer 1)
+print(f"Weights of first layer: \n{weights_and_biases[0]}")
+print(f"Biases of first layer: \n{weights_and_biases[1]}")
+
+# Example: Modify the weights and biases of the first layer
+# Let's scale the weights of the first layer by a factor of 2
+weights_and_biases[0] = weights_and_biases[0] * 2  # Modify weights
+weights_and_biases[1] = weights_and_biases[1] + 0.5  # Modify biases
+
+# Set the modified weights and biases back into the model
+best_model.set_weights(weights_and_biases)
+
+# Re-train the model after modifying weights and biases
+best_model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
+
+# Evaluate the model again after modification
+loss, mae = best_model.evaluate(x_test, y_test)
+print(f"Test MAE after modifying weights and biases: {mae}")
+
+
+TO UPDATE PARAMETERS
+best_hp.values['optimize'] = 0.0001  # Change the learning rate
+best_hp.values['momentum'] = 0.8    # Change the momentum
+
 
