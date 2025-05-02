@@ -49,6 +49,7 @@ best_model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
 loss, accuracy = best_model.evaluate(x_test, y_test)
 print(f"Test Accuracy: {accuracy}")
 
+TO SEE WEIGHTS
 # After training the best model, we can access the weights and biases:
 weights_and_biases = best_model.get_weights()
 
@@ -57,3 +58,31 @@ for i, (w, b) in enumerate(zip(weights_and_biases[::2], weights_and_biases[1::2]
     print(f"Layer {i+1} Weights: \n{w}")
     print(f"Layer {i+1} Biases: \n{b}")
     print("-" * 50)
+
+TO CHANGE WEIGHTS 
+# Access the current weights and biases of the best model
+weights_and_biases = best_model.get_weights()
+
+# Let's print the original weights and biases of the first layer
+print("Original Weights of Layer 1:", weights_and_biases[0])
+print("Original Biases of Layer 1:", weights_and_biases[1])
+
+# Example: Modify weights and biases
+# For illustration, let's randomly modify the weights of the first layer (e.g., scaling them by a factor of 2)
+weights_and_biases[0] = weights_and_biases[0] * 2  # Modify weights for the first layer
+weights_and_biases[1] = weights_and_biases[1] + 0.5  # Modify biases for the first layer (adding 0.5)
+
+# Print the modified weights and biases for Layer 1
+print("Modified Weights of Layer 1:", weights_and_biases[0])
+print("Modified Biases of Layer 1:", weights_and_biases[1])
+
+# Now, set the modified weights and biases back into the model
+best_model.set_weights(weights_and_biases)
+
+# Re-train the model (you can re-run the same fitting or evaluate it)
+best_model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test)) 
+
+# Evaluate the model again with modified weights and biases
+loss, accuracy = best_model.evaluate(x_test, y_test)
+print(f"Test Accuracy after modifying weights and biases: {accuracy}")
+
